@@ -127,7 +127,13 @@ class Pastify(object):
             if after:
                 vim.command(f"normal! a{pattern}")
             else:
-                vim.command(f"normal! i{pattern}")
+                vim.command(f"normal! a{pattern}")
+        row = int(vim.eval("line('.')"))
+        col = int(vim.eval("col('.')"))
+        new_col = max(col - len(pattern) + 3, 1)
+        vim.command(f"call setpos('.', [0, {row}, {new_col}, 0])")
+        vim.command("startinsert")
+
 
     async def get_image(self, base64_text: str, placeholder_text: str) -> None:
         import re
