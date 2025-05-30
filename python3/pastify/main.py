@@ -119,18 +119,27 @@ class Pastify(object):
 
         if filetype not in self.config["ft"]:
             filetype = self.config["opts"]["default_ft"]
+
         pattern = self.config["ft"][filetype].replace("$IMG$", placeholder_text)
+        index = pattern.find(')')
+        pattern1 = ""
+        pattern2 = ""
+        if index != -1:
+            pattern1 = pattern[:index + 1]
+            pattern2 = pattern[index + 1:]
+
         # check if we're in visual mode to run a different command
-        if vim.eval("mode()") in ["v", "V", ""]:
-            vim.command(f"normal! c{pattern}")
-        else:
-            if after:
-                vim.command(f"normal! a{pattern}")
-            else:
-                vim.command(f"normal! a{pattern}")
         row = int(vim.eval("line('.')"))
         col = int(vim.eval("col('.')"))
-        new_col = max(col - len(pattern) + 3, 1)
+        new_col = col + 2
+        if vim.eval("mode()") in ["v", "V", ""]:
+            vim.command(f"normal! c{pattern1}")
+        else:
+            vim.command(f"normal! a{pattern1}")
+        if vim.eval("mode()") in ["v", "V", ""]:
+            vim.command(f"normal! c{pattern2}")
+        else:
+            vim.command(f"normal! a{pattern2}")
         vim.command(f"call setpos('.', [0, {row}, {new_col}, 0])")
         vim.command("startinsert")
 
